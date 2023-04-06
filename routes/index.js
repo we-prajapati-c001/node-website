@@ -17,7 +17,20 @@ router.get('/contact', function (req, res, next) {
 
 router.get('/link', function (req, res, next) {
   if (devicetype.isDevicePhone(req.headers['user-agent'])) {
-    res.redirect('applink');
+    const endPoint = process.env.ENDPOINT;
+    const dynamicLink = process.env.DYNAMICLINK;
+
+    const payload = {
+      "path": "/",
+      "data": {},
+      "auth": null
+    };
+    const parameters = `?payload=${JSON.stringify(payload)}`;
+    const encodedParameters = encodeURIComponent(parameters);
+    const deeplink = encodeURI(endPoint + encodedParameters);
+    const url = `${dynamicLink}${deeplink}`;
+
+    res.redirect(url);
   }
   else {
     res.render('error', { page: 'Error', menuId: 'link', status: 404, message: 'App Not Installed!' });
